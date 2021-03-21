@@ -1,0 +1,147 @@
+---
+title: "Yu_hw7"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+
+library(rvest)    
+library(dplyr)     
+library(tidyverse)     
+library(repurrrsive)
+listviewer::jsonedit(gh_users)  
+```
+
+# 1)  Using the following link
+
+```{r}
+
+# Names
+Link <- "https://www.imdb.com/list/ls091520106/"
+page = read_html(Link)
+Movietitles = page%>% html_nodes(".lister-item-header a")%>%
+html_text()
+Movietitles
+
+# Rating
+
+Link <- "https://www.imdb.com/list/ls091520106/"
+page = read_html(Link)
+Movieratings = page%>% html_nodes(".ipl-rating-star.small .ipl-rating-star__rating")%>%
+html_text()
+Movieratings
+
+# Runtime
+
+Link <- "https://www.imdb.com/list/ls091520106/"
+page = read_html(Link)
+Runtime = page%>% html_nodes(".runtime")%>%
+html_text()
+Runtime
+
+```
+
+```{r}
+Result = data.frame(Movietitles, Movieratings, Runtime)
+Result 
+```
+
+
+# 2)
+# a) Explain or describe nested Lists.  (Three or four sentences) A nested list is a list that appears as an element in another list. To extract an element from the nested list, we can proceed in two steps. First, extract the nested list, then extract the item of interest.
+
+# b) Open and explore data for Git Hub repos by running the following code gh_repo.  Comment on the structure and arrangement of the data (Two or three sentences)
+
+# c)  In two or three sentences, explain what happens to the data when you run the code; I think I got a nested list after running the codes, there are some contents or values in the list[30] and list[26]
+
+```{r}
+ repos <- tibble(repo = gh_repos)
+repos
+```
+
+
+
+# d)  Describe the data representation when the listserver tool is applied. And go into detail explaining why we have a nested List configuration. What do the numbers 30 and 68 represent ? (6 or 7 sentences)Run the following code:
+
+```{r}
+listviewer::jsonedit(gh_repos)
+```
+
+# e)  Use and show R unesting code to produce the tibble below.
+
+```{r}
+(users <- tibble(user = gh_users))
+
+# Lets take a look at the list data for each Github user
+
+listviewer::jsonedit(gh_users)
+
+# Now use the following code to print out the same information
+# in the console
+
+names(users$user[[1]])
+
+# Now transform the nested data into a data frames
+
+users %>%
+  unnest_wider(user)
+# Note that the characteristics have become column variables
+repos <- tibble(repo = gh_repos)
+repos
+listviewer::jsonedit(gh_repos)
+
+# You may not want all of the column variables.  You can use the command
+# hoist to select the variables and list content that you want.
+users %>% hoist(user,
+               id = "is",
+               name = "name",
+               full_name = "full_name",
+               owner = "owner",
+               private = "private",
+               html_url = "html_url",
+               description = "descriation",
+               fork = "fork",
+               url = "url")
+
+
+# Game of Thrones
+
+got_chars  # Lists regarding Game of Thrones characters that provides no 
+# special structure or organization
+
+
+# Let's organize the data into a tibble
+
+chars <- tibble(char = got_chars)
+chars
+
+# And now look at the data Lets look at the specific data for the 30 names
+listviewer::jsonedit(got_chars)   #1, #8, #17
+
+
+# Now transform the nested data into a data frame
+
+chars2 <- chars %>% unnest_wider(char)
+chars2
+
+# This is more complex than gh_users because some component of char are
+# themselves a list, giving us a collection of list-columns:
+
+chars2 %>% select_if(is.list)
+
+# What you do next will depend on the purposes of the analysis. Maybe you 
+# want a row for every book and TV series that the character appears in:
+
+chars2 %>% 
+  select(name, books, tvSeries) %>% 
+  pivot_longer(c(books, tvSeries), names_to = "media", values_to = "value") %>% 
+  unnest_longer(value)
+
+# Or maybe you want to build a table that lets you match title to name:
+  
+chars2 %>% 
+  select(name, title = titles) %>% 
+  unnest_longer(title)
+```
+
+
