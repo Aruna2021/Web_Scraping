@@ -1,7 +1,8 @@
 ---
-title: "Yu_hw7"
+title: "Aruna_yu_hw7"
 output: word_document
 ---
+
 
 ```{r setup, include=FALSE}
 
@@ -104,8 +105,7 @@ listviewer::jsonedit(gh_repos)
 #                url = "url") -> u
 tibble(repo = gh_repos) %>%
   unnest_auto(repo) %>%
-  unnest_auto(repo) %>%
-  select(id, name, full_name, owner, private, html_url, description, fork, url)
+  unnest_auto(repo)
 
 ```
 
